@@ -162,6 +162,9 @@ function VH(){return probe.offsetHeight||innerHeight}
 function copyNeed(){var m=0;cs.forEach(function(c){var cb=c.getBoundingClientRect(),cp=c.querySelector('.pc-copy').getBoundingClientRect();m=Math.max(m,cp.bottom-cb.top)});return m}
 function lvl(a){ps.classList.remove('c1','c2');a.forEach(function(c){ps.classList.add(c)});top=parseFloat(getComputedStyle(ps).getPropertyValue('--top'))||92}
 function chk(){reset();var lv=[[],['c1'],['c1','c2']],ok=false;ps.classList.remove('flat','c1','c2','fit');ps.style.removeProperty('--imh');
+ /* Phones: one fixed card layout with the full-size image. Never compact, shrink or flatten,
+    so cards keep the same size the whole time you scroll. */
+ if(innerWidth<768){lvl([]);size();return}
  /* Stacking is scroll-position layout, not animation, so it stays on with Reduce Motion. */
  for(var i=0;i<lv.length&&!ok;i++){lvl(lv[i]);ok=top+size()+PILL<=VH()}
  /* tightest level: allow the floating menu to cover only the bottom of the image */
