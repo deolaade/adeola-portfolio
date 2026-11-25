@@ -1,5 +1,14 @@
 /* Site behaviour, moved from the original inline scripts. */
-(function(){var w=window,o=w.addEventListener;if(document.readyState==='complete'){w.__aaRestore=function(){w.addEventListener=o};w.addEventListener=function(t,f,p){if(t==='load'){setTimeout(f,0);return}return o.call(this,t,f,p)}}})();
+(function(){var w=window,o=w.addEventListener,done=document.readyState==='complete';
+ /* While the site scripts register their listeners:
+    - 'load' handlers run straight away if the page has already loaded (Next.js loads this file late);
+    - 'resize' handlers only run when the WIDTH changes. Mobile browsers fire 'resize' every time
+      the address bar slides in or out while scrolling; re-measuring then caused the hero glitch. */
+ w.__aaRestore=function(){w.addEventListener=o};
+ w.addEventListener=function(t,f,p){
+  if(t==='load'&&done){setTimeout(f,0);return}
+  if(t==='resize'&&this===w){var lw=w.innerWidth;return o.call(w,t,function(e){if(w.innerWidth===lw)return;lw=w.innerWidth;f.call(w,e)},p)}
+  return o.call(this,t,f,p)}})();
 
     (function(){var el=document.getElementById('greet');if(!el)return;var t;
     function g(h){return h>=5&&h<12?'hey, good morning!':h>=12&&h<17?'hey, good afternoon!':'hey, good evening!'}
@@ -52,10 +61,10 @@ addEventListener('pointerup',function(){dn=false;t.classList.remove('drag')});
 var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches,wms=[].slice.call(d.querySelectorAll('.wm')),L=[];
 wms.forEach(function(p){p.textContent='';p.dataset.t.split('|').forEach(function(line){var wl=d.createElement('span');wl.className='wl';
  line.split('').forEach(function(c){var s=d.createElement('span');s.textContent=c===' '?'\u00a0':c;wl.appendChild(s);L.push({el:s,p:p,w:800,v:''})});p.appendChild(wl)})});
-function fit(){wms.forEach(function(p){if(!p.offsetParent)return;var C=p.parentNode.clientWidth,sp=[].slice.call(p.querySelectorAll('.wl>span')),m=0;
+function fit(){wms.forEach(function(p){if(p.classList.contains('mb')){p.classList.add('ok');return}if(!p.offsetParent)return;var C=p.parentNode.clientWidth,sp=[].slice.call(p.querySelectorAll('.wl>span')),m=0;
  sp.forEach(function(s){s.style.width='';s.style.fontVariationSettings='"wght" 800'});p.style.fontSize='100px';
  [].slice.call(p.children).forEach(function(l){m=Math.max(m,l.getBoundingClientRect().width)});
- p.style.fontSize=Math.min(200,100*C/m)+'px';p.classList.add('ok');
+ if(!(m>0)){p.classList.add('ok');return}p.style.fontSize=Math.min(200,100*C/m)+'px';p.classList.add('ok');
  sp.forEach(function(s){s.style.width=s.getBoundingClientRect().width+'px'})});
  L.forEach(function(o){o.w=800;o.v=''})}
 var mx=0,my=0,on=false,raf=0;
@@ -148,16 +157,17 @@ function size(){ps.style.setProperty('--bh','0px');var bh=0,h=0;cs.forEach(funct
 function settled(){return !flat()&&cs[N-1].getBoundingClientRect().top<=top+1}
 function reset(){front=null;ps.classList.remove('sw');cs.forEach(function(c){c.style.zIndex=''})}
 function marks(){var on=settled()?(front===null?N-1:front):-1;tabs.forEach(function(t,k){if(k===on)t.setAttribute('aria-current','true');else t.removeAttribute('aria-current')})}
-var PILL=100;
+var PILL=100,probe=document.createElement('div');probe.style.cssText='position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';document.body.appendChild(probe);
+function VH(){return probe.offsetHeight||innerHeight}
 function copyNeed(){var m=0;cs.forEach(function(c){var cb=c.getBoundingClientRect(),cp=c.querySelector('.pc-copy').getBoundingClientRect();m=Math.max(m,cp.bottom-cb.top)});return m}
 function lvl(a){ps.classList.remove('c1','c2');a.forEach(function(c){ps.classList.add(c)});top=parseFloat(getComputedStyle(ps).getPropertyValue('--top'))||92}
 function chk(){reset();var lv=[[],['c1'],['c1','c2']],ok=false;ps.classList.remove('flat','c1','c2','fit');ps.style.removeProperty('--imh');
  /* Stacking is scroll-position layout, not animation, so it stays on with Reduce Motion. */
- for(var i=0;i<lv.length&&!ok;i++){lvl(lv[i]);ok=top+size()+PILL<=innerHeight}
+ for(var i=0;i<lv.length&&!ok;i++){lvl(lv[i]);ok=top+size()+PILL<=VH()}
  /* tightest level: allow the floating menu to cover only the bottom of the image */
- if(!ok){lvl(lv[2]);var sz=size(),im=cs[0].querySelector('.pc-img').offsetHeight;ok=top+sz-.3*im+PILL<=innerHeight;
+ if(!ok){lvl(lv[2]);var sz=size(),im=cs[0].querySelector('.pc-img').offsetHeight;ok=top+sz-.3*im+PILL<=VH();
   /* phones: shrink the image until the card fits the screen, instead of switching stacking off */
-  if(!ok&&innerWidth<768){var nh=Math.max(96,Math.floor(im-(top+sz+PILL-innerHeight)));ps.style.setProperty('--imh',nh+'px');ps.classList.add('fit');size();ok=true}}
+  if(!ok&&innerWidth<768){var nh=Math.max(96,Math.floor(im-(top+sz+PILL-VH())));ps.style.setProperty('--imh',nh+'px');ps.classList.add('fit');size();ok=true}}
  if(!ok){lvl([]);ps.classList.add('flat');size()}}
 function f(){tk=0;
  if(flat()){cs.forEach(function(c){c.style.setProperty('--q',0)});return}
@@ -174,8 +184,7 @@ function q(){if(!tk)tk=requestAnimationFrame(f)}
 addEventListener('scroll',q,{passive:true});
 addEventListener('resize',function(){chk();q()});addEventListener('load',function(){chk();q()});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){chk();q()});
-chk();
-if(window.visualViewport){var vw0=innerWidth,vt=0;visualViewport.addEventListener('resize',function(){if(innerWidth!==vw0){vw0=innerWidth;return}clearTimeout(vt);vt=setTimeout(function(){chk();q()},150)})};f();
+chk();f();
 })();
 
 ;
@@ -206,7 +215,7 @@ addEventListener('hashchange',route);route();
 
 ;
 
-(function(){var d=document;function fit(){d.querySelectorAll('.wm').forEach(function(p){if(!p.offsetParent)return;var cw=p.parentElement.clientWidth,w=0;[].forEach.call(p.querySelectorAll('.wl'),function(wl){var a=wl.firstElementChild,z=wl.lastElementChild;if(a&&z)w=Math.max(w,z.getBoundingClientRect().right-a.getBoundingClientRect().left)});if(w>cw+1){var k=cw/w*.97;p.style.fontSize=(parseFloat(getComputedStyle(p).fontSize)*k)+'px';[].forEach.call(p.querySelectorAll('.wl>span'),function(x){x.style.width=(x.getBoundingClientRect().width*k)+'px'})}})}
+(function(){var d=document;function fit(){d.querySelectorAll('.wm').forEach(function(p){if(p.classList.contains('mb')||!p.offsetParent)return;var cw=p.parentElement.clientWidth,w=0;[].forEach.call(p.querySelectorAll('.wl'),function(wl){var a=wl.firstElementChild,z=wl.lastElementChild;if(a&&z)w=Math.max(w,z.getBoundingClientRect().right-a.getBoundingClientRect().left)});if(w>cw+1){var k=cw/w*.97;p.style.fontSize=(parseFloat(getComputedStyle(p).fontSize)*k)+'px';[].forEach.call(p.querySelectorAll('.wl>span'),function(x){x.style.width=(x.getBoundingClientRect().width*k)+'px'})}})}
 var t;function run(){clearTimeout(t);t=setTimeout(fit,220)}
 addEventListener('resize',run);addEventListener('load',run);if(d.fonts&&d.fonts.ready)d.fonts.ready.then(run);setTimeout(run,400);setTimeout(run,1500);
 })();

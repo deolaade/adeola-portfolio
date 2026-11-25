@@ -618,3 +618,6 @@ body{overflow-x:hidden;overflow-x:clip}
 @media(prefers-reduced-motion:reduce){.ps::after{display:block}.pc{position:sticky}.ps.flat::after{display:none}.ps.flat .pc{position:static}}
 /* Case-study pull quotes sit on a light page in both themes, so they need a fixed dark ink. */
 .cs .cx-main .pq{color:#111114}
+/* Hero headline on phones: sized by CSS from the screen width (14.8% of the text column),
+   so nothing is measured or re-measured while scrolling. */
+@media(max-width:700px){.wm.mb{font-size:calc((100vw - 40px)*.148)!important;visibility:visible!important}.wm.mb .wl>span{width:auto!important}}
