@@ -39,4 +39,4 @@ npx vercel --prod
 ```
 
 Link previews (WhatsApp, LinkedIn, X) use your Vercel production address automatically.
-If you add a custom domain, set the environment variable `NEXT_PUBLIC_SITE_URL` (for example `https://adeolaadeyoyin.com`) in Vercel and redeploy.
+The site address is set by the `NEXT_PUBLIC_SITE_URL` environment variable in Vercel (currently `https://adeolaadeyoyin.vercel.app`). If you add a custom domain, update it there and redeploy.
