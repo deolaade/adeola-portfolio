@@ -621,3 +621,6 @@ body{overflow-x:hidden;overflow-x:clip}
 /* Hero headline on phones: sized by CSS from the screen width (14.8% of the text column),
    so nothing is measured or re-measured while scrolling. */
 @media(max-width:700px){.wm.mb{font-size:calc((100vw - 40px)*.148)!important;visibility:visible!important}.wm.mb .wl>span{width:auto!important}}
+/* Business goals: the tilted cards poke below their box, so leave room before the next paragraph. */
+.bg-fan{margin-bottom:24px}
+@media(max-width:760px){.bg-fan{padding-bottom:40px!important;margin-bottom:0}}
