@@ -270,3 +270,43 @@ bs.forEach(function(b){b.addEventListener('click',function(){t.scrollBy({left:st
 t.addEventListener('scroll',upd,{passive:true});t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){e.preventDefault();t.scrollBy({left:step(),behavior:'smooth'})}else if(e.key==='ArrowLeft'){e.preventDefault();t.scrollBy({left:-step(),behavior:'smooth'})}});
 addEventListener('resize',upd);setTimeout(upd,300);new MutationObserver(upd).observe(document.getElementById('cs')||document.body,{attributes:true,subtree:true,attributeFilter:['hidden','class']});})();
 ;if(window.__aaRestore){window.__aaRestore();delete window.__aaRestore}
+
+;/* Email links on desktop: many computers have no email app set up, so a plain mailto: link
+   does nothing. On desktop, show a small menu instead (email app, Gmail, Outlook, copy). Phones keep
+   the plain link, which opens the mail app directly. */
+(function(){var d=document,menu=null,src=null;
+ function desktop(){return matchMedia('(hover:hover) and (pointer:fine)').matches&&innerWidth>=768}
+ function parse(h){var u=h.replace(/^mailto:/,''),q=u.split('?'),p={};(q[1]||'').split('&').forEach(function(kv){if(!kv)return;var a=kv.split('=');p[decodeURIComponent(a[0]).toLowerCase()]=decodeURIComponent(a[1]||'')});return{to:decodeURIComponent(q[0]),su:p.subject||'',body:p.body||''}}
+ function ico(path){return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="'+path+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+ function close(back){if(!menu)return;menu.remove();menu=null;d.removeEventListener('pointerdown',outside,true);d.removeEventListener('keydown',key,true);removeEventListener('scroll',onScroll,true);if(back&&src)src.focus();src=null}
+ function outside(e){if(menu&&!menu.contains(e.target)&&e.target!==src&&!src.contains(e.target))close(false)}
+ function onScroll(){close(false)}
+ function key(e){if(!menu)return;var it=[].slice.call(menu.querySelectorAll('.em-i')),i=it.indexOf(d.activeElement);
+  if(e.key==='Escape'){e.preventDefault();close(true)}
+  else if(e.key==='ArrowDown'){e.preventDefault();it[(i+1)%it.length].focus()}
+  else if(e.key==='ArrowUp'){e.preventDefault();it[(i-1+it.length)%it.length].focus()}
+  else if(e.key==='Tab'){close(false)}}
+ function copy(t,btn){function ok(){var l=btn.querySelector('.em-l');l.textContent='Copied!';btn.classList.add('ok');setTimeout(function(){close(true)},900)}
+  if(navigator.clipboard&&isSecureContext)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+  function fb(){var x=d.createElement('textarea');x.value=t;x.setAttribute('readonly','');x.style.cssText='position:fixed;opacity:0';d.body.appendChild(x);x.select();try{d.execCommand('copy')}catch(e){}x.remove();ok()}}
+ function open(a){var m=parse(a.getAttribute('href')),e=encodeURIComponent;
+  var gm='https://mail.google.com/mail/?view=cm&fs=1&to='+e(m.to)+(m.su?'&su='+e(m.su):'')+(m.body?'&body='+e(m.body):'');
+  var ol='https://outlook.live.com/mail/0/deeplink/compose?to='+e(m.to)+(m.su?'&subject='+e(m.su):'')+(m.body?'&body='+e(m.body):'');
+  menu=d.createElement('div');menu.className='em';menu.setAttribute('role','menu');menu.setAttribute('aria-label','Email '+m.to);
+  menu.innerHTML='<p class="em-h">'+m.to+'</p>'+
+   '<a class="em-i" role="menuitem" href="'+a.getAttribute('href')+'">'+ico('M4 6h16v12H4zM4 7l8 6 8-6')+'<span class="em-l">Open email app</span></a>'+
+   '<a class="em-i" role="menuitem" href="'+gm+'" target="_blank" rel="noopener noreferrer">'+ico('M4 6h16v12H4zM4 6l8 7 8-7M4 18l6-6M20 18l-6-6')+'<span class="em-l">Gmail</span></a>'+
+   '<a class="em-i" role="menuitem" href="'+ol+'" target="_blank" rel="noopener noreferrer">'+ico('M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 5 9-5M12 12v9')+'<span class="em-l">Outlook</span></a>'+
+   '<button class="em-i" role="menuitem" type="button">'+ico('M9 9h11v11H9zM5 15H4V4h11v1')+'<span class="em-l">Copy email address</span></button>';
+  d.body.appendChild(menu);src=a;
+  menu.querySelector('button').addEventListener('click',function(){copy(m.to,this)});
+  [].forEach.call(menu.querySelectorAll('a.em-i'),function(x){x.addEventListener('click',function(){setTimeout(function(){close(false)},0)})});
+  var r=a.getBoundingClientRect(),mw=menu.offsetWidth,mh=menu.offsetHeight,x=Math.min(Math.max(12,r.left+r.width/2-mw/2),innerWidth-mw-12),y=r.bottom+10;
+  if(y+mh>innerHeight-12)y=Math.max(12,r.top-mh-10);
+  menu.style.left=x+'px';menu.style.top=y+'px';
+  d.addEventListener('pointerdown',outside,true);d.addEventListener('keydown',key,true);addEventListener('scroll',onScroll,true);
+  menu.querySelector('.em-i').focus()}
+ d.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="mailto:"]');if(!a||(menu&&menu.contains(a))||!desktop()||e.metaKey||e.ctrlKey||e.shiftKey)return;
+  e.preventDefault();var same=src===a;close(false);if(!same)open(a)});
+ d.addEventListener('keydown',function(e){if(menu)return;var a=d.activeElement;if(a&&a.matches&&a.matches('a[href^="mailto:"]')&&(e.key==='ArrowDown')&&desktop()){e.preventDefault();open(a)}});
+})();

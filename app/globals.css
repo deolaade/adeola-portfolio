@@ -624,3 +624,12 @@ body{overflow-x:hidden;overflow-x:clip}
 /* Business goals: the tilted cards poke below their box, so leave room before the next paragraph. */
 .bg-fan{margin-bottom:24px}
 @media(max-width:760px){.bg-fan{padding-bottom:40px!important;margin-bottom:0}}
+/* Email menu (desktop) */
+.em{position:fixed;z-index:9999;min-width:248px;padding:8px;border-radius:var(--r-lg,24px);background:var(--card);color:var(--fg);border:1px solid var(--ln);box-shadow:0 24px 60px -18px rgba(20,10,40,.35),0 6px 16px -8px rgba(20,10,40,.2);font-family:var(--sans)}
+@media(prefers-reduced-motion:no-preference){.em{animation:emIn .16s cubic-bezier(.2,.8,.2,1)}@keyframes emIn{from{opacity:0;transform:translateY(-4px) scale(.98)}}}
+.em-h{margin:4px 10px 8px;font-size:13px;color:var(--mut);white-space:nowrap}
+.em-i{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:16px;background:none;color:inherit;font:500 15px/1 var(--sans);text-align:left;text-decoration:none;cursor:pointer}
+.em-i svg{width:20px;height:20px;flex:none;opacity:.8}
+.em-i:hover,.em-i:focus-visible{background:color-mix(in srgb,var(--fg) 7%,transparent);outline:none}
+.em-i:focus-visible{box-shadow:inset 0 0 0 2px #9322EF}
+.em-i.ok{color:#1f8f4e}
