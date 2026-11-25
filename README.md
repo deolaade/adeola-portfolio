@@ -22,7 +22,7 @@ npm run dev      # http://localhost:3000
 | Case studies | `components/case-studies/` (Rezidant, Filmhouse, Pyyr, Lohli) |
 | All styles and design tokens | `app/globals.css` (tokens are at the top of the design-system block) |
 | Animations and interactions | `public/js/site.js` |
-| Images, fonts, link-preview image | `public/images`, `public/fonts`, `public/preview.jpg` |
+| Images, fonts, link-preview image | `public/images`, `public/fonts`, `public/og-image.jpg` |
 
 To swap an image, replace the file in `public/images` and keep the same name.
 

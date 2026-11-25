@@ -151,10 +151,13 @@ function marks(){var on=settled()?(front===null?N-1:front):-1;tabs.forEach(funct
 var PILL=100;
 function copyNeed(){var m=0;cs.forEach(function(c){var cb=c.getBoundingClientRect(),cp=c.querySelector('.pc-copy').getBoundingClientRect();m=Math.max(m,cp.bottom-cb.top)});return m}
 function lvl(a){ps.classList.remove('c1','c2');a.forEach(function(c){ps.classList.add(c)});top=parseFloat(getComputedStyle(ps).getPropertyValue('--top'))||92}
-function chk(){reset();var lv=[[],['c1'],['c1','c2']],ok=false;ps.classList.remove('flat','c1','c2');
- if(!reduce){for(var i=0;i<lv.length&&!ok;i++){lvl(lv[i]);ok=top+size()+PILL<=innerHeight}
-  /* tightest level: allow the floating menu to cover only the bottom of the image */
-  if(!ok){lvl(lv[2]);var sz=size(),im=cs[0].querySelector('.pc-img').offsetHeight;ok=top+sz-.3*im+PILL<=innerHeight}}
+function chk(){reset();var lv=[[],['c1'],['c1','c2']],ok=false;ps.classList.remove('flat','c1','c2','fit');ps.style.removeProperty('--imh');
+ /* Stacking is scroll-position layout, not animation, so it stays on with Reduce Motion. */
+ for(var i=0;i<lv.length&&!ok;i++){lvl(lv[i]);ok=top+size()+PILL<=innerHeight}
+ /* tightest level: allow the floating menu to cover only the bottom of the image */
+ if(!ok){lvl(lv[2]);var sz=size(),im=cs[0].querySelector('.pc-img').offsetHeight;ok=top+sz-.3*im+PILL<=innerHeight;
+  /* phones: shrink the image until the card fits the screen, instead of switching stacking off */
+  if(!ok&&innerWidth<768){var nh=Math.max(96,Math.floor(im-(top+sz+PILL-innerHeight)));ps.style.setProperty('--imh',nh+'px');ps.classList.add('fit');size();ok=true}}
  if(!ok){lvl([]);ps.classList.add('flat');size()}}
 function f(){tk=0;
  if(flat()){cs.forEach(function(c){c.style.setProperty('--q',0)});return}
@@ -171,7 +174,8 @@ function q(){if(!tk)tk=requestAnimationFrame(f)}
 addEventListener('scroll',q,{passive:true});
 addEventListener('resize',function(){chk();q()});addEventListener('load',function(){chk();q()});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){chk();q()});
-chk();f();
+chk();
+if(window.visualViewport){var vw0=innerWidth,vt=0;visualViewport.addEventListener('resize',function(){if(innerWidth!==vw0){vw0=innerWidth;return}clearTimeout(vt);vt=setTimeout(function(){chk();q()},150)})};f();
 })();
 
 ;

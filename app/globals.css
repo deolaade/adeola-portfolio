@@ -608,3 +608,13 @@ nav a.on:focus-visible{outline-color:#000;outline-offset:-4px}
 .cp[data-slug=lohli] .lh-steps .ch3-c:nth-child(4){background:#0062D6;color:#fff}
 .cp[data-slug=lohli] .lh-steps .ch3-c:nth-child(4) p{color:rgba(255,255,255,.86)}
 .blk h3 i{font:italic 400 1.1em/1 var(--ser2);letter-spacing:-.01em}#process .sh i,#experience h2 i{font-family:var(--ser2)!important;font-style:italic!important;font-weight:400!important;font-size:1.1em;line-height:1;letter-spacing:-.01em;font-variation-settings:normal!important}@media(max-width:767px){nav{gap:8px;padding:7px}nav a{min-width:66px;min-height:52px}nav a svg{width:23px;height:23px}}
+
+/* ===== fixes (Nov 2026) ===== */
+/* Safari: clip horizontal overflow without turning <body> into a scroll container (keeps sticky stacking working). */
+body{overflow-x:hidden;overflow-x:clip}
+/* Project cards on phones: image shrinks to fit the screen so cards always stack. */
+.ps.fit .pc-img,.ps.fit .pc-img.shot{height:var(--imh)!important;aspect-ratio:auto!important;min-height:0!important}
+/* Keep stacking with Reduce Motion on; only the dimming and transitions are dropped. */
+@media(prefers-reduced-motion:reduce){.ps::after{display:block}.pc{position:sticky}.ps.flat::after{display:none}.ps.flat .pc{position:static}}
+/* Case-study pull quotes sit on a light page in both themes, so they need a fixed dark ink. */
+.cs .cx-main .pq{color:#111114}
